@@ -1,14 +1,20 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nome = trim($_POST['nome']);
-    $email = trim($_POST['email']);
-    $telefone = trim($_POST['telefone']);
+$nome = $_POST['nome'];
+$email = $_POST['email'];
+$mensagem = $_POST['mensagem'];
 
-    $linha = "$nome | $email | $telefone" . PHP_EOL;
-    file_put_contents("contatos.txt", $linha, FILE_APPEND);
+$linha = "$nome - $email - $mensagem" . PHP_EOL;
 
-    header("Location: index.php");
+// Caminho absoluto (se quiser salvar fora da pasta do site, mais seguro)
+$arquivo = 'contatos.txt';
+
+if (file_put_contents($arquivo, $linha, FILE_APPEND | LOCK_EX)) {
+    header('Location: index.php?sucesso=1');
     exit;
 } else {
-    echo "Acesso inválido.";
+    // Evite mostrar erro antes do header
+    file_put_contents('php://stderr', "Erro ao salvar\n");
+    header('Location: index.php?erro=1');
+    exit;
 }
+?>
